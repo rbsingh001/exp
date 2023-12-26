@@ -1,19 +1,21 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const sequelize = require('./utils/database');
+const expRoutes = require('./routes/exp');
+
+var cors = require('cors');
 const app = express();
 
-const adminRoutes = require('./routes/admin');
-const shopRoutes = require('./routes/shop');
+app.use(cors());
+app.use(bodyParser.json({ extended: false }))
 
-app.use(bodyParser.urlencoded({extended: false}));
-
-app.use(adminRoutes);
-app.use(shopRoutes);
-
-app.use((req,res,next)=>{
-    res.status(404).send('<h1>Page not found</h1>');
-})
+app.use('/', expRoutes);
 
 
-app.listen(3000);
+sequelize.sync()
+    .then((result) => {
+        console.log("app started")
+        app.listen(3000);
+    })
+    .catch(err => console.log(err));
